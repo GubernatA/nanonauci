@@ -10,6 +10,7 @@
     var CANVAS_HEIGHT = 600;
     var NANONAUT_WIDTH = 181;
     var NANONAUT_HEIGHT = 229;
+    var NANONAUT_Y_ACCELERATION = 1;
     var GROUND_Y = 540;
     
     // INITIAL CONFIGURATION
@@ -21,9 +22,13 @@
     
     var nanonautImage = new Image();
     nanonautImage.src = 'Nanonaut.png';
+    
+    var backgroundImage = new Image();
+    backgroundImage.src = 'background.png';
         
     var nanonautX = 50;
     var nanonautY = 40;
+    var nanonautYSpeed = 0;
     
     window.addEventListener('load',start);
 
@@ -41,6 +46,13 @@
 
     // UPDATE
     function update() {
+    //Update Nanonaut position
+      nanonautY = nanonautY + nanonautYSpeed;
+      nanonautYSpeed = nanonautYSpeed + NANONAUT_Y_ACCELERATION;
+      if(nanonautY > (GROUND_Y - NANONAUT_HEIGHT)){
+        nanonautY = GROUND_Y - NANONAUT_HEIGHT;
+        nanonautYSpeed = 0;
+      }
     }
     
     // DRAWING
@@ -51,6 +63,9 @@
     //Draw Sky
     c.fillStyle = 'LightSkyBlue';
     c.fillRect(0, 0, CANVAS_WIDTH, GROUND_Y - 40);
+    
+    //Draw Background
+    c.drawImage(backgroundImage, 0, -210);
     
     //Draw Ground
     c.fillStyle = 'ForestGreen';
