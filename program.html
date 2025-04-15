@@ -23,6 +23,9 @@
 	var ROBOT_NR_ANIMATION_FRAMES = 9;
 	var ROBOT_ANIMATION_SPEED = 5;
     var ROBOT_X_SPEED = 4;
+	var MIN_DISTANCE_BETWEEN_ROBOTS = 400;
+	var MAX_DISTANCE_BETWEEN_ROBOTS = 1200;
+	var MAX_ACTIVE_ROBOTS = 3;
 	
     // INITIAL CONFIGURATION
     var canvas = document.createElement('canvas');
@@ -75,12 +78,13 @@
       image: robotImage
     };
     
-    var robotData = [{
+	var robotData = []; 
+/*    var robotData = [{
     x:400,
     y:GROUND_Y - ROBOT_HEIGHT,
     frameNr: 0
     }];
-    
+*/    
     window.addEventListener('keydown',onKeyDown);
     window.addEventListener('keyup',  onKeyUp);
     
@@ -176,6 +180,30 @@
 					robotData[i].frameNr = 0;
 				}
 			}
+		}
+		// Remove robots that are out of screen
+		var robotIndex = 0;
+		while(robotIndex < robotData.length) {
+			if(robotData[robotIndex].x < cameraX - ROBOT_WIDTH) {
+				robotData.splice(robotIndex, 1);
+				//console.log("Robot removed!");
+			}else {
+				robotIndex += 1;
+			}
+		}
+		
+		if(robotData.length < MAX_ACTIVE_ROBOTS) {
+			var lastRobotX  = CANVAS_WIDTH;
+			if (robotData.length > 0 ) {
+				lastRobotX= robotData[robotData.length - 1].x;
+			}
+			var newRobotX = lastRobotX + MIN_DISTANCE_BETWEEN_ROBOTS + Math.random() * 
+				(MAX_DISTANCE_BETWEEN_ROBOTS - MIN_DISTANCE_BETWEEN_ROBOTS);
+				robotData.push({
+					x: newRobotX,
+					y: GROUND_Y - ROBOT_HEIGHT,
+					frameNr: 0
+				});
 		}
 	}
     
