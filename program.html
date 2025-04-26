@@ -64,6 +64,20 @@
     var cameraY = 0;
     var gameFrameCounter = 0;
     
+	var nanonautCollisionRectangle = {
+		xOffset: 60,
+		yOffset: 20,
+		width: 50,
+		height: 200
+	};
+	
+	var robotCollisionRectangle = {
+		xOffset: 50,
+		yOffset: 20,
+		width: 50,
+		height: 100
+	};
+	
     var nanonautSpriteSheet = {
     nrFramesPerRow: 5,
     spriteWidth: NANONAUT_WIDTH,
@@ -173,6 +187,18 @@
 	function updateRobots() {
 		// Moving and update robots
 		for(var i=0; i<robotData.length; i++) {
+			if(doesNanonautOverlapRobot(
+			nanonautX + nanonautCollisionRectangle.xOffset,
+			nanonautY + nanonautCollisionRectangle.yOffset,
+			nanonautCollisionRectangle.width,
+			nanonautCollisionRectangle.height,
+			robotData[i].x + robotCollisionRectangle.xOffset,
+			robotData[i].y + robotCollisionRectangle.yOffset,
+			robotCollisionRectangle.width,
+			robotCollisionRectangle.height
+			)) {
+				console.log('AŁA!');
+			}
 			robotData[i].x -= ROBOT_X_SPEED;
 			if((gameFrameCounter % ROBOT_ANIMATION_SPEED) === 0) {
 				robotData[i].frameNr = robotData[i].frameNr + 1;
@@ -207,6 +233,18 @@
 		}
 	}
     
+	function doesNanonautOverlapRobotAlongOneAxis(nanonautNearX, nanonautFarX, robotNearX, robotFarX) {
+		var nanonautOverlapsNearRobotEdge = (nanonautFarX >= robotNearX) && (nanonautFarX <= robotFarX);
+		var nanonautOverlapsFarRobotEdge = (nanonautNearX >= robotNearX) && (nanonautNearX <= robotFarX);
+		var nanonautOverlapsEntireRobot = (nanonautNearX <= robotNearX) && (nanonautFarX >= robotFarX);
+		return nanonautOverlapsNearRobotEdge || nanonautOverlapsFarRobotEdge || nanonautOverlapsEntireRobot;
+	}
+	
+	function doesNanonautOverlapRobot(nanonautX, nanonautY, nanonautWidth, nanonautHeight, robotX, robotY, robotWidth, robotHeight) {
+		var nanonautOverlapsRobotOnXAxis = doesNanonautOverlapRobotAlongOneAxis(nanonautX, nanonautX + nanonautWidth, robotX, robotX + robotWidth);
+		var nanonautOverlapsRobotOnYAxis = doesNanonautOverlapRobotAlongOneAxis(nanonautY, nanonautY + nanonautHeight, robotY, robotY + robotHeight);
+		return nanonautOverlapsRobotOnXAxis && nanonautOverlapsRobotOnYAxis;
+	}
     // DRAWING
     function draw() {
     //Clear display
