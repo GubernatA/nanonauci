@@ -28,7 +28,12 @@
 	var MAX_DISTANCE_BETWEEN_ROBOTS = 1200;
 	var MAX_ACTIVE_ROBOTS = 3;
 	var SCREENSHAKE_RADIUS = 16;
-    // INITIAL CONFIGURATION
+	var PLAY_GAME_MODE = 0;
+	var GAME_OVER_GAME_MODE = 1;
+    
+	// INITIAL CONFIGURATION
+	var gameMode = PLAY_GAME_MODE;
+	
     var canvas = document.createElement('canvas');
     var c = canvas.getContext('2d');
     canvas.width = CANVAS_WIDTH;
@@ -151,6 +156,8 @@
     }
     // UPDATE
     function update() {
+	if(gameMode != PLAY_GAME_MODE) return;
+	
     gameFrameCounter = gameFrameCounter + 1;
     nanonautX = nanonautX + NANONAUT_X_SPEED;
     
@@ -189,6 +196,11 @@
 		screenshake = true;
 		if(nanonautHealth > 0) {
 			nanonautHealth -= 1;
+		}
+		// Check if the game is over
+		if(nanonautHealth <= 0) {
+			gameMode = GAME_OVER_GAME_MODE; 
+			screenshake = false;
 		}
 	}
 	
@@ -257,6 +269,7 @@
 		var nanonautOverlapsRobotOnYAxis = doesNanonautOverlapRobotAlongOneAxis(nanonautY, nanonautY + nanonautHeight, robotY, robotY + robotHeight);
 		return nanonautOverlapsRobotOnXAxis && nanonautOverlapsRobotOnYAxis;
 	}
+	
     // DRAWING
     function draw() {
     //Clear display
@@ -282,13 +295,13 @@
     c.fillStyle = 'ForestGreen';
     c.fillRect(0, GROUND_Y - 40, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_Y + 40);
     
-    //Draw Bushes
+    // Draw Bushes
     for(var i=0; i < bushData.length; i++) {
 	  var currentBush = bushData[i];
       c.drawImage(currentBush.image, currentBush.x-shakenCameraX, GROUND_Y - currentBush.y - shakenCameraY);
     }
     
-    //Draw Robots
+    // Draw Robots
     for(var i=0; i < robotData.length; i++) {
       drawAnimatedSprite(robotData[i].x - shakenCameraX,
       robotData[i].y - shakenCameraY, robotData[i].frameNr, robotSpriteSheet);
@@ -297,13 +310,21 @@
         drawAnimatedSprite(nanonautX - shakenCameraX,
       nanonautY - shakenCameraY, nanonautFrameNr, nanonautSpriteSheet);
       
-	// Draw Nanonaut heath bar
+	// Draw Nanonaut health  progress bar
 	c.fillStyle = 'red';
 	c.fillRect(400, 10, nanonautHealth / NANONAUT_MAX_HEALTH * 380, 20);
 	c.strokeStyle = 'red';
 	c.strokeRect(400,10,380, 20);
+    
+	// If game is over display "Game over" message.
+	if (gameMode == GAME_OVER_GAME_MODE) {
+		c.fillStyle = 'black';
+		c.font = '96px sans-serif';
+		c.fillText('KONIEC GRY', 120, 300);
+	}
 	
-    //Function for animated sprites 
+    }
+		//Function for animated sprites 
     function drawAnimatedSprite(screenX, screenY, frameNr, spriteSheet) {
       var spriteSheetRow = Math.floor(frameNr / spriteSheet.nrFramesPerRow);
       var spriteSheetColumn = frameNr % spriteSheet.nrFramesPerRow;
@@ -317,8 +338,6 @@
        spriteSheet.spriteWidth,  spriteSheet.spriteHeight
        );
     };
-    
-    }
     </script>
   </body>
 </html>
